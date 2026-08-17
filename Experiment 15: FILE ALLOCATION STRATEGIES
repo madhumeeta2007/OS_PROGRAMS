@@ -1,0 +1,88 @@
+##Experiment 15(a): FILE ALLOCATION STRATEGIES — SEQUENTIAL
+#include <stdio.h>
+
+int main(void)
+{
+    char name[50];
+    int sizeKB, blockSize, start;
+
+    printf("Enter file name: ");
+    scanf("%49s",name);
+    printf("Enter file size in KB: ");
+    scanf("%d",&sizeKB);
+    printf("Enter block size in bytes: ");
+    scanf("%d",&blockSize);
+    printf("Enter starting block: ");
+    scanf("%d",&start);
+
+    int blocks=(sizeKB*1024 + blockSize-1)/blockSize;
+
+    printf("\nFile Name\tStart\tNBlocks\tBlocks\n");
+    printf("%s\t\t%d\t%d\t",name,start,blocks);
+
+    for(int i=0;i<blocks;i++)
+        printf("%d%s",start+i,(i==blocks-1)?"":"->");
+    printf("\n");
+
+    return 0;
+}
+##Experiment 15(b): FILE ALLOCATION STRATEGIES — INDEXED
+#include <stdio.h>
+
+int main(void)
+{
+    char name[50];
+    int n, indexBlock, blocks[100];
+
+    printf("Enter file name: ");
+    scanf("%49s",name);
+    printf("Enter index block: ");
+    scanf("%d",&indexBlock);
+    printf("Enter number of data blocks: ");
+    scanf("%d",&n);
+
+    printf("Enter data block numbers: ");
+    for(int i=0;i<n;i++) scanf("%d",&blocks[i]);
+
+    printf("\nFile Name: %s\n",name);
+    printf("Index Block: %d\n",indexBlock);
+    printf("Data Blocks: ");
+
+    for(int i=0;i<n;i++)
+        printf("%d%s",blocks[i],(i==n-1)?"":" -> ");
+    printf("\n");
+
+    return 0;
+}
+##Experiment 15(c): FILE ALLOCATION STRATEGIES — LINKED
+#include <stdio.h>
+
+int main(void)
+{
+    char name[50];
+    int start, end, n, block[100];
+
+    printf("Enter file name: ");
+    scanf("%49s",name);
+    printf("Enter starting block: ");
+    scanf("%d",&start);
+    printf("Enter number of intermediate blocks: ");
+    scanf("%d",&n);
+
+    printf("Enter intermediate blocks: ");
+    for(int i=0;i<n;i++) scanf("%d",&block[i]);
+
+    printf("Enter ending block: ");
+    scanf("%d",&end);
+
+    printf("\nFile Name\tStart\tEnd\n");
+    printf("%s\t\t%d\t%d\n",name,start,end);
+
+    printf("Linked allocation: %d",start);
+    for(int i=0;i<n;i++)
+        printf(" -> %d",block[i]);
+    printf(" -> %d\n",end);
+
+    return 0;
+}
+
