@@ -1,0 +1,80 @@
+#include <stdio.h>
+
+void firstFit(int p[], int np, int b[], int nb)
+{
+    int used[20]={0};
+    printf("\nFIRST FIT\n");
+    for(int i=0;i<np;i++){
+        int found=0;
+        for(int j=0;j<nb;j++){
+            if(!used[j] && b[j]>=p[i]){
+                printf("Process %d of size %d is allocated in block %d of size %d\n",
+                       i,p[i],j,b[j]);
+                used[j]=1; found=1; break;
+            }
+        }
+        if(!found)
+            printf("Process %d of size %d is not allocated\n",i,p[i]);
+    }
+}
+
+void bestFit(int p[], int np, int b[], int nb)
+{
+    int used[20]={0};
+    printf("\nBEST FIT\n");
+    for(int i=0;i<np;i++){
+        int best=-1;
+        for(int j=0;j<nb;j++)
+            if(!used[j] && b[j]>=p[i] &&
+               (best==-1 || b[j]<b[best]))
+                best=j;
+
+        if(best!=-1){
+            printf("Process %d of size %d is allocated in block %d of size %d\n",
+                   i,p[i],best,b[best]);
+            used[best]=1;
+        }else
+            printf("Process %d of size %d is not allocated\n",i,p[i]);
+    }
+}
+
+void worstFit(int p[], int np, int b[], int nb)
+{
+    int used[20]={0};
+    printf("\nWORST FIT\n");
+    for(int i=0;i<np;i++){
+        int worst=-1;
+        for(int j=0;j<nb;j++)
+            if(!used[j] && b[j]>=p[i] &&
+               (worst==-1 || b[j]>b[worst]))
+                worst=j;
+
+        if(worst!=-1){
+            printf("Process %d of size %d is allocated in block %d of size %d\n",
+                   i,p[i],worst,b[worst]);
+            used[worst]=1;
+        }else
+            printf("Process %d of size %d is not allocated\n",i,p[i]);
+    }
+}
+
+int main(void)
+{
+    int np,nb,p[20],b[20];
+
+    printf("Enter the number of processes: ");
+    scanf("%d",&np);
+    printf("Enter process sizes: ");
+    for(int i=0;i<np;i++) scanf("%d",&p[i]);
+
+    printf("Enter the number of blocks: ");
+    scanf("%d",&nb);
+    printf("Enter block sizes: ");
+    for(int i=0;i<nb;i++) scanf("%d",&b[i]);
+
+    firstFit(p,np,b,nb);
+    bestFit(p,np,b,nb);
+    worstFit(p,np,b,nb);
+
+    return 0;
+}
