@@ -1,0 +1,49 @@
+#include <stdio.h>
+
+int main(void)
+{
+    int ms, ps, np, rempages, x, y, offset;
+    int pages[20], frame[20][20];
+
+    printf("Enter the memory size: ");
+    scanf("%d",&ms);
+    printf("Enter the page size: ");
+    scanf("%d",&ps);
+
+    int totalFrames = ms / ps;
+    printf("The number of pages available in memory are: %d\n", totalFrames);
+
+    printf("Enter number of processes: ");
+    scanf("%d",&np);
+
+    rempages = totalFrames;
+
+    for(int i=1;i<=np;i++){
+        printf("Enter number of pages required for P%d: ",i);
+        scanf("%d",&pages[i]);
+
+        if(pages[i] > rempages){
+            printf("Memory is full\n");
+            return 0;
+        }
+
+        rempages -= pages[i];
+
+        printf("Enter page table for P%d: ",i);
+        for(int j=0;j<pages[i];j++)
+            scanf("%d",&frame[i][j]);
+    }
+
+    printf("Enter process number, page number and offset: ");
+    scanf("%d%d%d",&x,&y,&offset);
+
+    if(x<1 || x>np || y<0 || y>=pages[x] || offset<0 || offset>=ps){
+        printf("Invalid Process or Page Number or Offset\n");
+        return 0;
+    }
+
+    int physicalAddress = frame[x][y] * ps + offset;
+    printf("The Physical Address is: %d\n", physicalAddress);
+
+    return 0;
+}
