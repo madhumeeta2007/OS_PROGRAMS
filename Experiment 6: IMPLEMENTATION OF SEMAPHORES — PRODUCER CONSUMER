@@ -1,0 +1,56 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <unistd.h>
+#include <sys/ipc.h>
+#include <sys/sem.h>
+#include <sys/wait.h>
+
+union semun {
+    int val;
+    struct semid_ds *buf;
+    unsigned short *array;
+};
+
+int main(void)
+{
+    const int items = 5;
+    int semid = semget(IPC_PRIVATE, 1, 0600);
+    if (semid == -1) {
+        perror("semget");
+        return 1;
+    }
+
+    union semun arg;
+    arg.val = 0;
+    if (semctl(semid, 0, SETVAL, arg) == -1) {
+        perror("semctl");
+        return 1;
+    }
+
+    pid_t pid = fork();
+    if (pid < 0) {
+        perror("fork");
+        return 1;
+    }
+
+    struct sembuf op;
+
+    if (pid == 0) {
+        for (int i=0;i<items;i++) {
+            op.sem_num=0; op.sem_op=-1; op.sem_flg=0;
+            semop(semid,&op,1);
+            printf("Consumer consumed item %d\n",i);
+        }
+    } else {
+        for (int i=0;i<items;i++) {
+            printf("Producer produced item %d\n",i);
+            op.sem_num=0; op.sem_op=1; op.sem_flg=0;
+            semop(semid,&op,1);
+            sleep(1);
+        }
+        wait(NULL);
+        semctl(semid,0,IPC_RMID);
+    }
+
+    return 0;
+}
