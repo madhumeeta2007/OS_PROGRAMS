@@ -1,0 +1,231 @@
+##Experiment 14(a): FILE ORGANIZATION TECHNIQUES — SINGLE LEVEL DIRECTORY
+#include <stdio.h>
+#include <string.h>
+
+int main(void)
+{
+    char files[20][50], name[50];
+    int count=0, choice;
+
+    do{
+        printf("\n1.Create File  2.Delete File  3.Search File  4.Display  5.Exit\n");
+        printf("Enter choice: ");
+        scanf("%d",&choice);
+
+        if(choice==1){
+            if(count<20){
+                printf("Enter file name: ");
+                scanf("%49s",files[count++]);
+                printf("File created\n");
+            }
+        }else if(choice==2){
+            printf("Enter file name: ");
+            scanf("%49s",name);
+            int found=-1;
+            for(int i=0;i<count;i++)
+                if(strcmp(files[i],name)==0){ found=i; break; }
+            if(found==-1) printf("File not found\n");
+            else{
+                for(int i=found;i<count-1;i++)
+                    strcpy(files[i],files[i+1]);
+                count--;
+                printf("File deleted\n");
+            }
+        }else if(choice==3){
+            printf("Enter file name: ");
+            scanf("%49s",name);
+            int found=0;
+            for(int i=0;i<count;i++)
+                if(strcmp(files[i],name)==0) found=1;
+            printf(found ? "File is found\n" : "File not found\n");
+        }else if(choice==4){
+            if(count==0) printf("Directory Empty\n");
+            else{
+                printf("The Files are:");
+                for(int i=0;i<count;i++) printf(" %s",files[i]);
+                printf("\n");
+            }
+        }
+    }while(choice!=5);
+
+    return 0;
+}
+##Experiment 14(b): FILE ORGANIZATION TECHNIQUES — TWO LEVEL DIRECTORY
+#include <stdio.h>
+#include <string.h>
+
+typedef struct {
+    char name[30];
+    char files[20][30];
+    int count;
+} Directory;
+
+int main(void)
+{
+    Directory dir[10];
+    int dcount=0, choice;
+    char dname[30], fname[30];
+
+    do{
+        printf("\n1.Create Directory 2.Create File 3.Delete File\n");
+        printf("4.Search File 5.Display 6.Exit\nEnter choice: ");
+        scanf("%d",&choice);
+
+        if(choice==1){
+            printf("Enter directory name: ");
+            scanf("%29s",dir[dcount].name);
+            dir[dcount].count=0;
+            dcount++;
+            printf("Directory created\n");
+        }else if(choice==2){
+            printf("Enter directory name: ");
+            scanf("%29s",dname);
+            int i;
+            for(i=0;i<dcount;i++)
+                if(strcmp(dname,dir[i].name)==0) break;
+            if(i==dcount) printf("Directory not found\n");
+            else{
+                printf("Enter file name: ");
+                scanf("%29s",dir[i].files[dir[i].count++]);
+                printf("File created\n");
+            }
+        }else if(choice==3){
+            printf("Enter directory name: ");
+            scanf("%29s",dname);
+            printf("Enter file name: ");
+            scanf("%29s",fname);
+            int i,k,found=0;
+            for(i=0;i<dcount;i++)
+                if(strcmp(dname,dir[i].name)==0){
+                    for(k=0;k<dir[i].count;k++)
+                        if(strcmp(fname,dir[i].files[k])==0){
+                            for(int j=k;j<dir[i].count-1;j++)
+                                strcpy(dir[i].files[j],dir[i].files[j+1]);
+                            dir[i].count--; found=1; break;
+                        }
+                }
+            printf(found ? "File deleted\n" : "File not found\n");
+        }else if(choice==4){
+            printf("Enter directory name: ");
+            scanf("%29s",dname);
+            printf("Enter file name: ");
+            scanf("%29s",fname);
+            int found=0;
+            for(int i=0;i<dcount;i++)
+                if(strcmp(dname,dir[i].name)==0)
+                    for(int j=0;j<dir[i].count;j++)
+                        if(strcmp(fname,dir[i].files[j])==0) found=1;
+            printf(found ? "File is found\n" : "File not found\n");
+        }else if(choice==5){
+            for(int i=0;i<dcount;i++){
+                printf("%s:",dir[i].name);
+                for(int j=0;j<dir[i].count;j++) printf(" %s",dir[i].files[j]);
+                printf("\n");
+            }
+        }
+    }while(choice!=6);
+
+    return 0;
+}
+##Experiment 14(c): FILE ORGANIZATION TECHNIQUES — HIERARCHICAL DIRECTORY
+#include <stdio.h>
+#include <stdlib.h>
+
+typedef struct Node {
+    char name[30];
+    int isDir;
+    int count;
+    struct Node *child[10];
+} Node;
+
+Node *createNode(const char *prompt)
+{
+    Node *n = malloc(sizeof(Node));
+    printf("%s",prompt);
+    scanf("%29s",n->name);
+
+    printf("Enter 1 for directory, 0 for file: ");
+    scanf("%d",&n->isDir);
+
+    n->count=0;
+    if(n->isDir){
+        printf("Enter number of children: ");
+        scanf("%d",&n->count);
+        for(int i=0;i<n->count;i++)
+            n->child[i]=createNode("Enter child name: ");
+    }
+    return n;
+}
+
+void display(Node *root,int level)
+{
+    for(int i=0;i<level;i++) printf("  ");
+    printf("%s%s\n",root->name,root->isDir?"/":"");
+
+    for(int i=0;i<root->count;i++)
+        display(root->child[i],level+1);
+}
+
+void freeTree(Node *root)
+{
+    for(int i=0;i<root->count;i++) freeTree(root->child[i]);
+    free(root);
+}
+
+int main(void)
+{
+    printf("Create hierarchical directory tree\n");
+    Node *root=createNode("Enter root name: ");
+
+    printf("\nDirectory Tree:\n");
+    display(root,0);
+
+    freeTree(root);
+    return 0;
+}
+##Experiment 14(d): FILE ORGANIZATION TECHNIQUES — DIRECTED ACYCLIC GRAPH
+#include <stdio.h>
+#include <string.h>
+
+typedef struct {
+    char name[30];
+} Node;
+
+typedef struct {
+    int from;
+    int to;
+} Link;
+
+int main(void)
+{
+    Node nodes[20];
+    Link links[30];
+    int n,l;
+
+    printf("Enter number of nodes: ");
+    scanf("%d",&n);
+
+    for(int i=0;i<n;i++){
+        printf("Enter node %d name: ",i);
+        scanf("%29s",nodes[i].name);
+    }
+
+    printf("Enter number of links: ");
+    scanf("%d",&l);
+
+    for(int i=0;i<l;i++){
+        printf("Enter source and destination index: ");
+        scanf("%d%d",&links[i].from,&links[i].to);
+    }
+
+    printf("\nDAG Links:\n");
+    for(int i=0;i<l;i++)
+        printf("%s -> %s\n",
+               nodes[links[i].from].name,
+               nodes[links[i].to].name);
+
+    return 0;
+}
+
+
+
